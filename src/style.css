@@ -1,0 +1,32 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif
+}
+
+.form-input{
+  @apply mt-2 block w-full rounded-md border border-gray-300 p-1.5 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm outline-none placeholder:text-xs
+}
+.active {
+  @apply border-b-2 border-indigo-500;
+  background-color: #fff !important;
+}
+.label{
+  @apply block text-xs text-gray-600
+}
+.btn-sm{
+  @apply px-2 py-1.5 text-xs border-gray-300 text-slate-500 border rounded-md
+}
+.btn-indigo{
+  @apply px-2 py-1 text-xs bg-indigo-500 text-white border-indigo-500
+}
+.btn-slate{
+  @apply px-2 py-1 text-xs bg-slate-500 text-white border-slate-500
+}
+.btn-outline-red{
+  @apply px-2 py-1 text-xs border-red-300 text-red-500 border rounded-md hover:bg-red-50
+}
