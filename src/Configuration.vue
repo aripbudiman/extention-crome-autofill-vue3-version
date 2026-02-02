@@ -29,8 +29,7 @@
         </div>
         <div class="border p-4 rounded-lg my-8" id="section-configuration-form">
             <div class="flex justify-between border-b-2 pb-4">
-                <h2 class="text-sm font-semibold text-gray-700
-          ">Create New Configurations</h2>
+                <h2 class="text-sm font-semibold text-gray-700">Create New Configurations</h2>
                 <button class="text-gray-400">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                         <path fill="currentColor"
@@ -50,22 +49,27 @@
             <hr class="my-4">
             <div class="flex justify-between items-center">
                 <h2 class="uppercase text-sm font-semibold text-slate-500">Doctors List</h2>
-                <button class="btn-sm hover:text-indigo-500 hover:border-indigo-500">+ Add Doctor</button>
+                <button class="btn-sm hover:text-indigo-500 hover:border-indigo-500" @click="configStore.addRowDoctor">+
+                    Add
+                    Doctor</button>
             </div>
-            <div class="py-3">
-                <div class="bg-slate-50 border border-gray-200 rounded  p-4">
+            <div class="py-3 flex flex-col gap-y-3">
+                <div class="bg-slate-50 border border-gray-200 rounded  p-4"
+                    v-for="(doctor, index) in configStore.currentConfig.doctors" :key="index">
                     <div class="header-list-dokter flex justify-between items-center">
                         <h3 class="text-sm  text-gray-800">Doctor #1</h3>
-                        <button class="btn-outline-red">Remove</button>
+                        <button class="btn-outline-red" @click="configStore.removeRowDoctor(index)">Remove</button>
                     </div>
                     <div class="grid grid-cols-2 gap-x-3 mt-2">
                         <div>
                             <label for="name" class="label">Doctor ID *</label>
-                            <input type="text" id="name" class="form-input" placeholder="0000000000001">
+                            <input type="text" id="name" class="form-input" v-model="doctor.id"
+                                placeholder="0000000000001">
                         </div>
                         <div>
                             <label for="name" class="label">Doctor Name *</label>
-                            <input type="text" id="name" class="form-input" placeholder="Dr. John Doe">
+                            <input type="text" id="name" class="form-input" v-model="doctor.name"
+                                placeholder="Dr. John Doe">
                         </div>
                     </div>
                 </div>
@@ -81,3 +85,12 @@
         </div>
     </div>
 </template>
+<script setup>
+import { useConfigStore } from './store/config-store'
+import { ref } from 'vue'
+import { reactive } from 'vue'
+
+const configStore = useConfigStore()
+
+
+</script>

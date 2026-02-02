@@ -1,0 +1,29 @@
+{
+    "configs": [{
+            "name": "config-dev",
+            "description": "for testing QA",
+            "doctors": [{
+                "id": "001",
+                "name": "test1"
+            }, {
+                "id": "002",
+                "name": "test2"
+            }],
+            "createdAt": "2023-01-01T00:00:00.000Z",
+            "updatedAt": "2023-01-01T00:00:00.000Z"
+        },
+        {
+            "name": "config-dev",
+            "description": "for testing QA",
+            "doctors": [{
+                "id": "001",
+                "name": "test1"
+            }, {
+                "id": "002",
+                "name": "test2"
+            }],
+            "createdAt": "2023-01-01T00:00:00.000Z",
+            "updatedAt": "2023-01-01T00:00:00.000Z"
+        }
+    ]
+}
