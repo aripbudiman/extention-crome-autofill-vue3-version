@@ -2,7 +2,7 @@
     <div id="page-configuration">
         <div class="flex justify-between items-center my-2">
             <h4 class="text-gray-800 text-sm font-semibold">Saved Configurations</h4>
-            <button
+            <button @click="showForm = !showForm"
                 class="px-2 py-1 bg-indigo-500 text-white text-xs rounded-md hover:scale-105 hover:shadow-md hover:transition-all">+
                 New
                 Config</button>
@@ -27,10 +27,10 @@
                 </div>
             </div>
         </div>
-        <div class="border p-4 rounded-lg my-8" id="section-configuration-form">
+        <div class="border p-4 rounded-lg my-8" id="section-configuration-form" v-if="showForm">
             <div class="flex justify-between border-b-2 pb-4">
                 <h2 class="text-sm font-semibold text-gray-700">Create New Configurations</h2>
-                <button class="text-gray-400">
+                <button class="text-gray-400" @click="showForm = !showForm">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                         <path fill="currentColor"
                             d="m12 13.4l-2.917 2.925q-.277.275-.704.275t-.704-.275q-.275-.275-.275-.7t.275-.7L10.6 12L7.675 9.108Q7.4 8.831 7.4 8.404t.275-.704q.275-.275.7-.275t.7.275L12 10.625L14.892 7.7q.277-.275.704-.275t.704.275q.3.3.3.713t-.3.687L13.375 12l2.925 2.917q.275.277.275.704t-.275.704q-.3.3-.712.3t-.688-.3z" />
@@ -57,7 +57,7 @@
                 <div class="bg-slate-50 border border-gray-200 rounded  p-4"
                     v-for="(doctor, index) in configStore.currentConfig.doctors" :key="index">
                     <div class="header-list-dokter flex justify-between items-center">
-                        <h3 class="text-sm  text-gray-800">Doctor #1</h3>
+                        <h3 class="text-sm  text-gray-800">Doctor #{{ index + 1 }}</h3>
                         <button class="btn-outline-red" @click="configStore.removeRowDoctor(index)">Remove</button>
                     </div>
                     <div class="grid grid-cols-2 gap-x-3 mt-2">
@@ -91,6 +91,7 @@ import { ref } from 'vue'
 import { reactive } from 'vue'
 
 const configStore = useConfigStore()
+const showForm = ref(false)
 
 
 </script>

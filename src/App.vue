@@ -29,5 +29,5 @@ import { ref } from 'vue'
 import Configuration from './Configuration.vue'
 import Autofill from './Autofill.vue'
 
-const tab = ref('config')
+const tab = ref('autofill')
 </script>
