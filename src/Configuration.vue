@@ -8,11 +8,11 @@
                 Config</button>
         </div>
         <div class="my-3 flex flex-col gap-y-3">
-            <div class="bg-slate-50 border border-gray-200 rounded p-3" v-for="i in 1">
+            <div class="bg-slate-50 border border-gray-200 rounded p-3" v-for="config in configStore.configs">
                 <div class="flex justify-between">
                     <div>
-                        <h2 class="text-sm">local2</h2>
-                        <p class="text-xs text-slate-500">test</p>
+                        <h2 class="text-sm" v-text="config.name"></h2>
+                        <p class="text-xs text-slate-500" v-text="config.description"></p>
                     </div>
                     <div class="flex gap-x-1">
                         <button class="btn-sm hover:bg-indigo-50 hover:border-indigo-300">✏️</button>
@@ -21,9 +21,9 @@
                 </div>
                 <hr class="my-2.5">
                 <div class="flex gap-x-3">
-                    <p class="text-[11px] text-gray-500">🧑🏻‍⚕️ 2 doctor(s)</p>
-                    <p class="text-[11px] text-gray-500">📝 Practitioner 3</p>
-                    <p class="text-[11px] text-gray-500">📅 2 Feb 2026</p>
+                    <p class="text-[11px] text-gray-500">🧑🏻‍⚕️ {{ config.doctors.length }} doctor(s)</p>
+                    <p class="text-[11px] text-gray-500">📝 {{ config.doctors[0].name }}</p>
+                    <p class="text-[11px] text-gray-500">📅 {{ formatDate(config.createdAt) }}</p>
                 </div>
             </div>
         </div>
@@ -39,12 +39,13 @@
             </div>
             <div class="my-4">
                 <label for="name" class="label">Configuration Name *</label>
-                <input type="text" id="name" class="form-input" placeholder="Devlopment">
+                <input type="text" id="name" class="form-input" placeholder="Devlopment"
+                    v-model="configStore.currentConfig.name">
             </div>
             <div class="my-4">
                 <label for="name" class="label">Description</label>
-                <textarea id="name" rows="2" class="form-input"
-                    placeholder="e.g., Configuration for puskesmas"></textarea>
+                <textarea id="name" rows="2" class="form-input" placeholder="e.g., Configuration for puskesmas"
+                    v-model="configStore.currentConfig.description"></textarea>
             </div>
             <hr class="my-4">
             <div class="flex justify-between items-center">
@@ -77,7 +78,7 @@
             <hr class="my-3">
             <div class="flex justify-end gap-x-2">
                 <button class="btn-sm btn-slate">Cancel</button>
-                <button class="btn-sm btn-indigo">Save Configuration</button>
+                <button class="btn-sm btn-indigo" @click="configStore.addConfig()">Save Configuration</button>
             </div>
         </div>
         <div class="flex justify-end">
@@ -88,10 +89,25 @@
 <script setup>
 import { useConfigStore } from './store/config-store'
 import { ref } from 'vue'
-import { reactive } from 'vue'
+import { onMounted } from 'vue'
 
 const configStore = useConfigStore()
 const showForm = ref(false)
 
+onMounted(async () => {
+    await configStore.loadConfigs()
+    console.log(configStore.configs)
+})
+
+function formatDate(isoString) {
+    const date = new Date(isoString);
+
+    const day = date.getDate();
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const month = months[date.getMonth()];
+    const year = date.getFullYear();
+
+    return `${day} ${month} ${year}`;
+}
 
 </script>

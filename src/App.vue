@@ -26,8 +26,15 @@
 
 <script setup>
 import { ref } from 'vue'
+import { onMounted } from 'vue';
 import Configuration from './Configuration.vue'
 import Autofill from './Autofill.vue'
+import { useConfigStore } from './store/config-store'
 
 const tab = ref('autofill')
+const configStore = useConfigStore()
+onMounted(async () => {
+
+  await configStore.loadConfigs()
+});
 </script>
