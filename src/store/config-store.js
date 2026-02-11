@@ -121,6 +121,27 @@ export const useConfigStore = defineStore("config", {
                 ...this.configs[index]
             };
         },
+        async setSelectedConfig(config) {
+            const configName = config.name;
+            if (chrome?.storage?.local) {
+                await new Promise((resolve, reject) => {
+                    chrome.storage.local.set({ activeConfig: configName }, () => {
+                        if (chrome.runtime.lastError) {
+                            console.error('Error saving selected config:', chrome.runtime.lastError);
+                            reject(chrome.runtime.lastError);
+                        } else {
+                            resolve();
+                        }
+                    });
+                });
+            } else {
+                try {
+                    localStorage.setItem('activeConfig', configName);
+                } catch (e) {
+                    console.error('Failed to save selected config to localStorage:', e);
+                }
+            }
+        },
         // Reset current config
         resetCurrentConfig() {
             this.currentConfig = {
