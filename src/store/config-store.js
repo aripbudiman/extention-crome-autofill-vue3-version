@@ -17,13 +17,39 @@ export const useConfigStore = defineStore("config", {
             }],
             createdAt: null,
             updatedAt: null
-        }
+        },
+        activeConfig: null,
     }),
     getters: {
         getAllConfigs: (state) => state.configs,
-        getCurrentConfig: (state) => state.currentConfig
+        getCurrentConfig: (state) => state.currentConfig,
     },
     actions: {
+        // Get active config from storage
+        async getActiveConfig() {
+            if (chrome?.storage?.local) {
+                return new Promise((resolve, reject) => {
+                    chrome.storage.local.get('activeConfig', (result) => {
+                        if (chrome.runtime.lastError) {
+                            console.error('Error loading activeConfig:', chrome.runtime.lastError);
+                            reject(chrome.runtime.lastError);
+                        } else {
+                            this.activeConfig = result.activeConfig || null;
+                            resolve(this.activeConfig);
+                        }
+                    });
+                });
+            } else {
+                try {
+                    const activeConfig = localStorage.getItem('activeConfig');
+                    this.activeConfig = activeConfig;
+                    return activeConfig;
+                } catch (e) {
+                    console.error('Failed to load activeConfig from localStorage:', e);
+                    return null;
+                }
+            }
+        },
         // Load configs from Chrome Storage
         async loadConfigs() {
             return new Promise((resolve, reject) => {
@@ -123,9 +149,18 @@ export const useConfigStore = defineStore("config", {
         },
         async setSelectedConfig(config) {
             const configName = config.name;
+            this.activeConfig = configName;
             if (chrome?.storage?.local) {
                 await new Promise((resolve, reject) => {
                     chrome.storage.local.set({ activeConfig: configName }, () => {
+                        if (chrome.runtime.lastError) {
+                            console.error('Error saving selected config:', chrome.runtime.lastError);
+                            reject(chrome.runtime.lastError);
+                        } else {
+                            resolve();
+                        }
+                    });
+                    chrome.storage.local.set({ data: config }, () => {
                         if (chrome.runtime.lastError) {
                             console.error('Error saving selected config:', chrome.runtime.lastError);
                             reject(chrome.runtime.lastError);
