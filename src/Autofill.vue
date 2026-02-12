@@ -45,14 +45,14 @@ const selectedConfigName = computed({
 // Load active config when component mounts
 onMounted(async () => {
     const activeConfig = await configStore.getActiveConfig()
-    console.log('Loaded activeConfig on mount:', activeConfig)
-    console.log('configStore.activeConfig:', configStore.activeConfig)
+    const data = await configStore.getData()
 })
 
 const selectConfig = async (config) => {
     await configStore.setSelectedConfig(config)
 }
 const btnAnamnesa = async () => {
+    const configData = configStore.data;
     const [tab] = await chrome.tabs.query({
         active: true,
         currentWindow: true
@@ -62,16 +62,27 @@ const btnAnamnesa = async () => {
         target: {
             tabId: tab.id
         },
-        function: fillAnamnesa
+        function: fillAnamnesa,
+        args: [configData]
     });
 }
 
-function fillAnamnesa() {
+
+function fillAnamnesa(config) {
+    console.log('Data yang diterima di browser:', config)
+    function randomAngka(min = 1, max = 6) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    const random = randomAngka(0, config.doctors.length)
+    const dokter = config.doctors[random]
+    console.log(dokter)
     const dokterTenagaMedis = document.querySelector('input[name="Anamnesa[dokter_id]"]');
     const dokterNama = document.querySelector('input[name="dokter_nama"]');
+    const keluhanUtama = document.querySelector('#keluhan');
 
-    dokterTenagaMedis.value = '0000000000006143';
-    dokterNama.value = 'Practitioner 3';
+    dokterTenagaMedis.value = dokter.id;
+    dokterNama.value = dokter.name;
+    keluhanUtama.value = 'sakit kepala, pusing, mual';
 }
 
 </script>

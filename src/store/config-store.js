@@ -19,13 +19,37 @@ export const useConfigStore = defineStore("config", {
             updatedAt: null
         },
         activeConfig: null,
+        data: {}
     }),
     getters: {
         getAllConfigs: (state) => state.configs,
-        getCurrentConfig: (state) => state.currentConfig,
+        getCurrentConfig: (state) => state.currentConfig
     },
     actions: {
-        // Get active config from storage
+        async getData() {
+            if (chrome?.storage?.local) {
+                return new Promise((resolve, reject) => {
+                    chrome.storage.local.get('data', (result) => {
+                        if (chrome.runtime.lastError) {
+                            console.error('Error loading data:', chrome.runtime.lastError);
+                            reject(chrome.runtime.lastError);
+                        } else {
+                            this.data = result.data || {};
+                            resolve(this.data);
+                        }
+                    });
+                });
+            } else {
+                try {
+                    const data = localStorage.getItem('data');
+                    this.data = JSON.parse(data) || {};
+                    return data;
+                } catch (e) {
+                    console.error('Failed to load data from localStorage:', e);
+                    return {};
+                }
+            }
+        },
         async getActiveConfig() {
             if (chrome?.storage?.local) {
                 return new Promise((resolve, reject) => {
@@ -50,15 +74,12 @@ export const useConfigStore = defineStore("config", {
                 }
             }
         },
-        // Load configs from Chrome Storage
         async loadConfigs() {
             return new Promise((resolve, reject) => {
-                // PENTING: Convert reactive object ke plain object/array
                 const plainConfigs = JSON.parse(JSON.stringify(toRaw(this.configs)));
 
                 console.log('Loading configs', plainConfigs);
 
-                // Guard check
                 if (!chrome?.storage?.local) {
                     console.warn('Chrome storage not available, using localStorage');
                     this.configs = JSON.parse(localStorage.getItem('configs') || '[]');
@@ -78,7 +99,6 @@ export const useConfigStore = defineStore("config", {
                 });
             })
         },
-        // Doctor management
         addRowDoctor() {
             this.currentConfig.doctors.push({
                 id: null,
@@ -88,15 +108,12 @@ export const useConfigStore = defineStore("config", {
         removeRowDoctor(idx) {
             this.currentConfig.doctors.splice(idx, 1);
         },
-        // Save configs to Chrome Storage
         async saveConfigs() {
             return new Promise((resolve, reject) => {
-                // PENTING: Convert reactive object ke plain object/array
                 const plainConfigs = JSON.parse(JSON.stringify(toRaw(this.configs)));
 
                 console.log('Saving configs', plainConfigs);
 
-                // Guard check
                 if (!chrome?.storage?.local) {
                     console.warn('Chrome storage not available, using localStorage');
                     localStorage.setItem('configs', JSON.stringify(plainConfigs));
@@ -117,7 +134,6 @@ export const useConfigStore = defineStore("config", {
                 });
             });
         },
-        // Add new config
         addConfig() {
             const newConfig = {
                 ...this.currentConfig,
@@ -128,7 +144,6 @@ export const useConfigStore = defineStore("config", {
             this.saveConfigs();
             this.resetCurrentConfig();
         },
-        // Update existing config
         updateConfig(index) {
             this.configs[index] = {
                 ...this.currentConfig,
@@ -136,12 +151,10 @@ export const useConfigStore = defineStore("config", {
             };
             this.saveConfigs();
         },
-        // Delete config
         deleteConfig(index) {
             this.configs.splice(index, 1);
             this.saveConfigs();
         },
-        // Load config untuk edit
         loadConfigToEdit(index) {
             this.currentConfig = {
                 ...this.configs[index]
@@ -176,8 +189,8 @@ export const useConfigStore = defineStore("config", {
                     console.error('Failed to save selected config to localStorage:', e);
                 }
             }
+            this.getData();
         },
-        // Reset current config
         resetCurrentConfig() {
             this.currentConfig = {
                 name: null,

@@ -15,7 +15,8 @@
                         <p class="text-xs text-slate-500" v-text="config.description"></p>
                     </div>
                     <div class="flex gap-x-1">
-                        <button class="btn-sm hover:bg-indigo-50 hover:border-indigo-300">✏️</button>
+                        <button class="btn-sm hover:bg-indigo-50 hover:border-indigo-300"
+                            @click="editConfig(config, configStore.configs.indexOf(config))">✏️</button>
                         <button class="btn-sm hover:bg-red-50 hover:border-red-300">🗑</button>
                     </div>
                 </div>
@@ -29,7 +30,8 @@
         </div>
         <div class="border p-4 rounded-lg my-8" id="section-configuration-form" v-if="showForm">
             <div class="flex justify-between border-b-2 pb-4">
-                <h2 class="text-sm font-semibold text-gray-700">Create New Configurations</h2>
+                <h2 class="text-sm font-semibold text-gray-700">{{ editingIndex !== null ? 'Edit Configuration' :
+                    'Create New Configuration' }}</h2>
                 <button class="text-gray-400" @click="showForm = !showForm">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
                         <path fill="currentColor"
@@ -78,7 +80,8 @@
             <hr class="my-3">
             <div class="flex justify-end gap-x-2">
                 <button class="btn-sm btn-slate">Cancel</button>
-                <button class="btn-sm btn-indigo" @click="configStore.addConfig()">Save Configuration</button>
+                <button class="btn-sm btn-indigo" @click="saveConfig">{{ editingIndex !== null ? 'Update Configuration'
+                    : 'Save Configuration' }}</button>
             </div>
         </div>
         <div class="flex justify-end">
@@ -93,11 +96,31 @@ import { onMounted } from 'vue'
 
 const configStore = useConfigStore()
 const showForm = ref(false)
+const editingIndex = ref(null)
 
 onMounted(async () => {
     await configStore.loadConfigs()
     console.log(configStore.configs)
 })
+
+function editConfig(config, index) {
+    editingIndex.value = index
+    configStore.loadConfigToEdit(index)
+    showForm.value = true
+}
+
+function saveConfig() {
+    if (editingIndex.value !== null) {
+        // Update existing config
+        configStore.updateConfig(editingIndex.value)
+        editingIndex.value = null
+    } else {
+        // Create new config
+        configStore.addConfig()
+    }
+    showForm.value = false
+    configStore.resetCurrentConfig()
+}
 
 function formatDate(isoString) {
     const date = new Date(isoString);
