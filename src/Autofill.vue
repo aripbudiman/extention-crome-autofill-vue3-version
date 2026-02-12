@@ -5,7 +5,26 @@
 </style>
 <template>
     <main class="p-2">
-        <h3 class="text-sm font-semibold text-gray-700 mb-2">Choose Configuration</h3>
+        <div class="flex justify-between items-center mb-2">
+            <h3 class="text-sm font-semibold text-gray-700">Choose Configuration</h3>
+            <div class="flex gap-x-2">
+                <button @click="openSidePanel" title="Open Side Panel (Always stay open)"
+                    class="text-gray-500 hover:text-indigo-500 hover:scale-110 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+                        <path fill="currentColor"
+                            d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m-7 16H5V5h7z" />
+                    </svg>
+                </button>
+                <button @click="openAsWindow" title="Open as floating window"
+                    class="text-gray-500 hover:text-indigo-500 hover:scale-110 transition-all">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 3h6v6m-11 5L21 3m-3 10v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                    </svg>
+                </button>
+            </div>
+        </div>
         <div id="list-config" class="grid grid-cols-2 border rounded gap-4 p-4">
             <label :for="'config' + i.name" name="config" v-for="(i, index) in configStore.configs"
                 @click="selectConfig(i)"
@@ -51,6 +70,21 @@ onMounted(async () => {
 const selectConfig = async (config) => {
     await configStore.setSelectedConfig(config)
 }
+
+const openAsWindow = () => {
+    chrome.windows.create({
+        url: chrome.runtime.getURL('index.html'),
+        type: 'popup',
+        width: 450,
+        height: 600
+    });
+}
+
+const openSidePanel = async () => {
+    const window = await chrome.windows.getCurrent();
+    await chrome.sidePanel.open({ windowId: window.id });
+}
+
 const btnAnamnesa = async () => {
     const configData = configStore.data;
     const [tab] = await chrome.tabs.query({
