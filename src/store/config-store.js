@@ -163,33 +163,46 @@ export const useConfigStore = defineStore("config", {
         async setSelectedConfig(config) {
             const configName = config.name;
             this.activeConfig = configName;
+            
             if (chrome?.storage?.local) {
-                await new Promise((resolve, reject) => {
-                    chrome.storage.local.set({ activeConfig: configName }, () => {
-                        if (chrome.runtime.lastError) {
-                            console.error('Error saving selected config:', chrome.runtime.lastError);
-                            reject(chrome.runtime.lastError);
-                        } else {
-                            resolve();
-                        }
+                try {
+                    // Save activeConfig and data sequentially to avoid race conditions
+                    await new Promise((resolve, reject) => {
+                        chrome.storage.local.set({ activeConfig: configName }, () => {
+                            if (chrome.runtime.lastError) {
+                                console.error('Error saving activeConfig:', chrome.runtime.lastError);
+                                reject(chrome.runtime.lastError);
+                            } else {
+                                resolve();
+                            }
+                        });
                     });
-                    chrome.storage.local.set({ data: config }, () => {
-                        if (chrome.runtime.lastError) {
-                            console.error('Error saving selected config:', chrome.runtime.lastError);
-                            reject(chrome.runtime.lastError);
-                        } else {
-                            resolve();
-                        }
+                    
+                    await new Promise((resolve, reject) => {
+                        chrome.storage.local.set({ data: config }, () => {
+                            if (chrome.runtime.lastError) {
+                                console.error('Error saving config data:', chrome.runtime.lastError);
+                                reject(chrome.runtime.lastError);
+                            } else {
+                                resolve();
+                            }
+                        });
                     });
-                });
+                } catch (error) {
+                    console.error('Failed to save selected config:', error);
+                    throw error;
+                }
             } else {
                 try {
                     localStorage.setItem('activeConfig', configName);
+                    localStorage.setItem('data', JSON.stringify(config));
                 } catch (e) {
                     console.error('Failed to save selected config to localStorage:', e);
+                    throw e;
                 }
             }
-            this.getData();
+            
+            await this.getData();
         },
         resetCurrentConfig() {
             this.currentConfig = {

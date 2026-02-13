@@ -8,13 +8,6 @@
         <div class="flex justify-between items-center mb-2">
             <h3 class="text-sm font-semibold text-gray-700">Choose Configuration</h3>
             <div class="flex gap-x-2">
-                <button @click="openSidePanel" title="Open Side Panel (Always stay open)"
-                    class="text-gray-500 hover:text-indigo-500 hover:scale-110 transition-all">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
-                        <path fill="currentColor"
-                            d="M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2m-7 16H5V5h7z" />
-                    </svg>
-                </button>
                 <button @click="openAsWindow" title="Open as floating window"
                     class="text-gray-500 hover:text-indigo-500 hover:scale-110 transition-all">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
@@ -61,7 +54,6 @@ const selectedConfigName = computed({
     }
 })
 
-// Load active config when component mounts
 onMounted(async () => {
     const activeConfig = await configStore.getActiveConfig()
     const data = await configStore.getData()
@@ -78,11 +70,6 @@ const openAsWindow = () => {
         width: 450,
         height: 600
     });
-}
-
-const openSidePanel = async () => {
-    const window = await chrome.windows.getCurrent();
-    await chrome.sidePanel.open({ windowId: window.id });
 }
 
 const btnAnamnesa = async () => {
@@ -103,20 +90,38 @@ const btnAnamnesa = async () => {
 
 
 function fillAnamnesa(config) {
-    console.log('Data yang diterima di browser:', config)
     function randomAngka(min = 1, max = 6) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
+    const listKeluhan=[
+        'sakit kepala, pusing, mual',
+        'sakit perut, mual, muntah',
+        'sakit gigi, sakit leher, sakit punggung',
+        'sakit kaki, sakit telapak kaki, sakit jari kaki',
+        'sakit tangan, sakit jari tangan, sakit telapak tangan',
+        'sakit kepala, pusing, mual',
+        'sakit perut, mual, muntah',
+    ]
+    const keluhan = listKeluhan[randomAngka(0, listKeluhan.length)]
     const random = randomAngka(0, config.doctors.length)
     const dokter = config.doctors[random]
-    console.log(dokter)
     const dokterTenagaMedis = document.querySelector('input[name="Anamnesa[dokter_id]"]');
     const dokterNama = document.querySelector('input[name="dokter_nama"]');
     const keluhanUtama = document.querySelector('#keluhan');
+    const sakitHariIni = document.querySelector('#sakit_hari');
+    const detakNadi = document.querySelector('#detak-nadi');
+    const nafas = document.querySelector('#nafas');
+    const sistole = document.querySelector('#sistole');
+    const diastole = document.querySelector('#diastole');
 
     dokterTenagaMedis.value = dokter.id;
     dokterNama.value = dokter.name;
-    keluhanUtama.value = 'sakit kepala, pusing, mual';
+    keluhanUtama.value = keluhan;
+    sakitHariIni.value = randomAngka(1, 7);
+    detakNadi.value = randomAngka(60, 100);
+    nafas.value = randomAngka(10, 20);
+    sistole.value = randomAngka(100, 120);
+    diastole.value = randomAngka(60, 80);
 }
 
 </script>

@@ -15,16 +15,12 @@
   "permissions": [
     "storage",
     "activeTab",
-    "scripting",
-    "sidePanel"
+    "scripting"
   ],
-  "side_panel": {
-    "default_path": "index.html"
-  },
   "host_permissions": [
     "<all_urls>"
   ],
   "content_security_policy": {
-    "extension_pages": "script-src 'self' http://localhost:* http://127.0.0.1:*; object-src 'self'"
+    "extension_pages": "script-src 'self'; object-src 'self'"
   }
 }
